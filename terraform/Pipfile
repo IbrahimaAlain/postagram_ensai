@@ -9,3 +9,5 @@ python_version = "3"
 [packages]
 cdktf = "~=0.20.5"
 pytest = "*"
+constructs = "*"
+cdktf-cdktf-provider-aws = "*"

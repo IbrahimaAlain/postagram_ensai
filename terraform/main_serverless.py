@@ -37,19 +37,23 @@ class ServerlessStack(TerraformStack):
 
         dynamo_table = DynamodbTable(
             self, "DynamodDB-table",
-            name= "",
-            hash_key="",
-            range_key="",
+            name= "my_table",
+            hash_key="user",
+            range_key="id",
             attribute=[
-                DynamodbTableAttribute(name="",type="S" ),
-                DynamodbTableAttribute(name="",type="S" ),
+                DynamodbTableAttribute(name="user",type="S" ),
+                DynamodbTableAttribute(name="id",type="S" ),
             ],
             billing_mode="PROVISIONED",
             read_capacity=5,
             write_capacity=5
         )
 
-        code = TerraformAsset()
+        code = TerraformAsset(
+            self, "code",
+            path="./lambda",
+            type=AssetType.ARCHIVE
+        )
 
         lambda_function = LambdaFunction(
             self, "lambda",
@@ -59,7 +63,7 @@ class ServerlessStack(TerraformStack):
             timeout=60,
             role=f"",
             filename= code.path,
-            handler="",
+            handler="lambda_function.lambda_handler",
             environment={"variables":{}}
         )
 
