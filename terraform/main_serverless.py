@@ -21,7 +21,7 @@ class ServerlessStack(TerraformStack):
         
         bucket = S3Bucket(
             self, "bucket",
-            bucket_prefix=""
+            bucket_prefix="my_bucket"
         )
 
         # NE PAS TOUCHER !!!!
@@ -37,7 +37,7 @@ class ServerlessStack(TerraformStack):
 
         dynamo_table = DynamodbTable(
             self, "DynamodDB-table",
-            name= "my_table",
+            name= "my_table_dynamo",
             hash_key="user",
             range_key="id",
             attribute=[
@@ -55,16 +55,19 @@ class ServerlessStack(TerraformStack):
             type=AssetType.ARCHIVE
         )
 
+        # Récupérer l'identifiant
+        caller_identity = DataAwsCallerIdentity(self, "CurrentIdentity")
+        
         lambda_function = LambdaFunction(
             self, "lambda",
-            function_name="",
+            function_name="lamba_postagram",
             runtime="python3.10",
             memory_size=128,
             timeout=60,
-            role=f"",
+            role=f"arn:aws:iam::{caller_identity.account_id}:role/LabRole",
             filename= code.path,
             handler="lambda_function.lambda_handler",
-            environment={"variables":{}}
+            environment={"variables":{"table": dynamo_table}}
         )
 
         # NE PAS TOUCHER !!!!
