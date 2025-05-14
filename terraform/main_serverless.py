@@ -49,6 +49,18 @@ class ServerlessStack(TerraformStack):
             write_capacity=5
         )
 
+        TerraformOutput(
+            self, "table_name_output",
+            value=dynamo_table.name,
+            description="Name of the DynamoDB table"
+        )
+
+        TerraformOutput(
+            self, "bucket_name_output",
+            value=bucket.bucket, 
+            description="Name of the S3 bucket"
+        )
+
         code = TerraformAsset(
             self, "code",
             path="./lambda",
@@ -67,7 +79,10 @@ class ServerlessStack(TerraformStack):
             role=f"arn:aws:iam::{caller_identity.account_id}:role/LabRole",
             filename= code.path,
             handler="lambda_function.lambda_handler",
-            environment={"variables":{"table": dynamo_table}}
+            environment={"variables":{
+                "table": dynamo_table.name,
+                "Bucket": bucket.bucket,
+            }}
         )
 
         # NE PAS TOUCHER !!!!
